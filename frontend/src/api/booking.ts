@@ -1,9 +1,17 @@
-import type { FlightChoice, FlightData, FlightResponse } from "@/interfaces/booking/flights";
+import type {
+  FlightChoice,
+  FlightData,
+  FlightResponse,
+} from "@/interfaces/booking/flights";
 import type { Order } from "@/interfaces/booking/order";
 import type { SeatData } from "@/interfaces/booking/seats";
-import type { BookingOptions } from "@/interfaces/booking/start";
+import type { Airport, BookingOptions } from "@/interfaces/booking/start";
 import { isNil, omitBy } from "lodash-es";
 import { useAPI } from "./useAPI";
+
+export const getAirports = () => {
+  return useAPI("/airport").get().json<Airport[]>();
+};
 
 export const getFlights = (data?: BookingOptions) => {
   if (data) {
@@ -18,9 +26,11 @@ export const getFlights = (data?: BookingOptions) => {
 
   return useAPI(`/ticketordering/flights?${queryString}`, {
     afterFetch(ctx) {
-      ctx.data.toFlights = ctx.data.toFlights.map(postProcessFlightResponse)
-      ctx.data.returnFlights = ctx.data.returnFlights.map(postProcessFlightResponse)
-      return ctx
+      ctx.data.toFlights = ctx.data.toFlights.map(postProcessFlightResponse);
+      ctx.data.returnFlights = ctx.data.returnFlights.map(
+        postProcessFlightResponse
+      );
+      return ctx;
     },
   })
     .get()
@@ -42,5 +52,5 @@ function postProcessFlightResponse(flight: FlightResponse) {
     ...flight,
     arrivalTime: new Date(flight.arrivalTime),
     departureTime: new Date(flight.departureTime),
-  }
+  };
 }
