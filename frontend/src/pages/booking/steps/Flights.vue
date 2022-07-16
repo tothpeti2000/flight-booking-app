@@ -34,8 +34,17 @@ onActivated(async () => {
 <template>
   <Spinner v-if="isFetching" />
 
-  <div v-else>
+  <div v-else class="mb-5">
     <FlightList :flights="data?.toFlights" />
+
+    <Divider
+      v-if="data?.returnFlights && data.returnFlights.length > 0"
+      align="center"
+      class="my-6"
+    >
+      <span class="p-tag">FlyTonight</span>
+    </Divider>
+
     <FlightList :flights="data?.returnFlights" isReturn />
   </div>
 

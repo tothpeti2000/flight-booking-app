@@ -13,7 +13,7 @@ const title = `${props.isReturn ? "Return" : ""} Flights available`;
 </script>
 
 <template>
-  <div class="" v-if="(isReturn && hasSearchedReturnFlight) || !isReturn">
+  <div v-if="(isReturn && hasSearchedReturnFlight) || !isReturn">
     <h1 class="mb-3">{{ title }}</h1>
 
     <div v-if="flights && flights.length > 0">
