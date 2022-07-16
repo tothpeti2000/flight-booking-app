@@ -13,16 +13,22 @@ export const getAirports = () => {
   return useAPI("/airport").get().json<Airport[]>();
 };
 
-export const getFlights = (data?: BookingOptions) => {
-  if (data) {
-    data.departureDate = (data.departureDate as Date).toLocaleDateString();
+export const getFlights = (data: BookingOptions | undefined) => {
+  let parsedOptions = {};
 
-    if (data.returnDate) {
-      data.returnDate = (data.returnDate as Date).toLocaleDateString();
-    }
+  if (data) {
+    parsedOptions = {
+      from: data.from?.name ?? "",
+      to: data.to?.name ?? "",
+      departureDate: data.departureDate.toLocaleDateString(),
+      returnDate: data.returnDate?.toLocaleDateString(),
+      passengerCount: data.passengerCount,
+    };
   }
 
-  const queryString = new URLSearchParams(omitBy(data, isNil)).toString();
+  const queryString = new URLSearchParams(
+    omitBy(parsedOptions, isNil)
+  ).toString();
 
   return useAPI(`/ticketordering/flights?${queryString}`, {
     afterFetch(ctx) {
@@ -47,10 +53,10 @@ export const placeOrder = (data: Order) => {
   return useAPI("ticketordering/order").post(data).json();
 };
 
-function postProcessFlightResponse(flight: FlightResponse) {
+const postProcessFlightResponse = (flight: FlightResponse) => {
   return {
     ...flight,
     arrivalTime: new Date(flight.arrivalTime),
     departureTime: new Date(flight.departureTime),
   };
-}
+};

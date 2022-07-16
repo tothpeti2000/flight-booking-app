@@ -2,21 +2,24 @@
 import type { SearchFlightsFormProps } from "@/interfaces/booking/searchFlightsFormProps";
 import { useBookingStore } from "@/store/store";
 import type { AutoCompleteCompleteEvent } from "primevue/autocomplete";
+import { ref } from "vue";
 import { datesValid } from "../validationUtils";
 import useSearchFlights from "./useSearchFlights";
 
-defineProps<SearchFlightsFormProps>();
+const props = defineProps<SearchFlightsFormProps>();
 
 const { saveBookingOptions } = useBookingStore()!;
 const { data: bookingOptions, v$ } = useSearchFlights();
 
 const emit = defineEmits(["prev-page", "next-page"]);
 
-const selectAirport = (e: AutoCompleteCompleteEvent) => {
-  console.log(e.query);
-};
+const filteredAirports = ref(props.airports);
 
-const cities = [{ name: "BUD", cityName: "Budapest" }];
+const searchAirport = (e: AutoCompleteCompleteEvent) => {
+  filteredAirports.value = props.airports.filter((airport) =>
+    airport.cityName.toUpperCase().startsWith(e.query.toUpperCase())
+  );
+};
 
 const validate = async () => {
   const isFormValid = await v$.value.$validate();
@@ -43,10 +46,11 @@ const validate = async () => {
       :errors="v$.from.$errors"
     >
       <AutoComplete
-        :suggestions="airports"
+        v-model="v$.from.$model"
+        :suggestions="filteredAirports"
+        @complete="searchAirport($event)"
         field="cityName"
-        @complete="selectAirport($event)"
-        :dropdown="true"
+        dropdown
       />
     </InputElement>
 
@@ -55,7 +59,13 @@ const validate = async () => {
       :has-error="v$.to.$invalid"
       :errors="v$.to.$errors"
     >
-      <AutoComplete :suggestions="cities" field="cityName" :dropdown="true" />
+      <AutoComplete
+        v-model="v$.to.$model"
+        :suggestions="filteredAirports"
+        @complete="searchAirport($event)"
+        field="cityName"
+        dropdown
+      />
     </InputElement>
 
     <InputElement

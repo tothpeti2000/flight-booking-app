@@ -1,6 +1,6 @@
 export interface BookingOptions {
-  from: string;
-  to: string;
+  from: Airport | undefined;
+  to: Airport | undefined;
   departureDate: Date;
   returnDate?: Date;
   passengerCount: number;

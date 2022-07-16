@@ -7,8 +7,8 @@ import { requiredField } from "../validationUtils";
 
 const useSearchFlights = () => {
   const data = reactive<BookingOptions>({
-    from: "",
-    to: "",
+    from: undefined,
+    to: undefined,
     departureDate: moment().add(1, "days").toDate(),
     returnDate: undefined,
     passengerCount: 1,
