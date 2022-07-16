@@ -2,10 +2,14 @@
 import PassengerForm from "@/components/forms/booking/PassengerForm.vue";
 import { validateMultipleForms } from "@/components/forms/validationUtils";
 import { useBookingStore } from "@/store/store";
+import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 
 const { bookingOptions, savePassengers } = useBookingStore()!;
-const totalPassengers = bookingOptions.value?.passengerCount ?? 0;
+
+const totalPassengers = computed(
+  () => bookingOptions.value?.passengerCount ?? 0
+);
 
 const passengerForms = ref<InstanceType<typeof PassengerForm>[] | null>(null);
 const emit = defineEmits(["prev-page", "next-page"]);
