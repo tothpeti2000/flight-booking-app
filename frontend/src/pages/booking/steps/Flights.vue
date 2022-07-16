@@ -2,18 +2,15 @@
 import { getFlights } from "@/api/booking";
 import { handleResponse } from "@/api/useAPI";
 import useFeedback from "@/components/useFeedback";
+import type { FlightData } from "@/interfaces/booking/flights";
 import { useBookingStore } from "@/store/store";
-import { onActivated } from "vue";
+import { onActivated, ref } from "vue";
 
 const { toFlight, bookingOptions } = useBookingStore()!;
 const { showError } = useFeedback();
 
-const {
-  execute: fetchFlights,
-  data,
-  isFetching,
-  statusCode,
-} = getFlights(bookingOptions.value);
+const flightData = ref<FlightData | null>();
+const fetching = ref(true);
 
 const emit = defineEmits(["prev-page", "next-page"]);
 
@@ -26,26 +23,35 @@ const validate = () => {
 };
 
 onActivated(async () => {
+  const {
+    execute: fetchFlights,
+    data,
+    statusCode,
+  } = getFlights(bookingOptions.value);
+
   await fetchFlights();
   handleResponse(statusCode.value, data.value);
+
+  fetching.value = false;
+  flightData.value = data.value;
 });
 </script>
 
 <template>
-  <Spinner v-if="isFetching" />
+  <Spinner v-if="fetching" />
 
   <div v-else class="mb-5">
-    <FlightList :flights="data?.toFlights" />
+    <FlightList :flights="flightData?.toFlights" />
 
     <Divider
-      v-if="data?.returnFlights && data.returnFlights.length > 0"
+      v-if="flightData?.returnFlights && flightData.returnFlights.length > 0"
       align="center"
       class="my-6"
     >
       <span class="p-tag">FlyTonight</span>
     </Divider>
 
-    <FlightList :flights="data?.returnFlights" isReturn />
+    <FlightList :flights="flightData?.returnFlights" isReturn />
   </div>
 
   <StepButtons

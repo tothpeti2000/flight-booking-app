@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import type { FlightListProps } from "@/interfaces/booking/flightListProps";
 import { useBookingStore } from "@/store/store";
+import { computed } from "@vue/reactivity";
 
 const props = withDefaults(defineProps<FlightListProps>(), {
   isReturn: false,
 });
 
 const { bookingOptions } = useBookingStore()!;
-const hasSearchedReturnFlight = !!bookingOptions.value?.returnDate;
+
+const hasSearchedReturnFlight = computed(
+  () => !!bookingOptions.value?.returnDate
+);
 
 const title = `${props.isReturn ? "Return" : ""} Flights available`;
 </script>
