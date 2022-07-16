@@ -28,7 +28,7 @@ const validate = async () => {
 
 <template>
   <div v-for="idx in totalPassengers" :key="idx">
-    <h1>Passenger #{{ idx }}</h1>
+    <h1 class="mb-4">Passenger #{{ idx }}</h1>
     <PassengerForm ref="passengerForms" />
   </div>
 
