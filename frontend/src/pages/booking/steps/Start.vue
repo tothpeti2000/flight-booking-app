@@ -12,6 +12,8 @@ onActivated(async () => {
 </script>
 
 <template>
-  <Spinner v-if="isFetching" />
-  <SearchFlightsForm v-else :airports="data ?? []" />
+  <KeepAlive>
+    <Spinner v-if="isFetching" />
+    <SearchFlightsForm v-else :airports="data ?? []" />
+  </KeepAlive>
 </template>
