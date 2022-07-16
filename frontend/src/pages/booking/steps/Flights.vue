@@ -32,7 +32,7 @@ onActivated(async () => {
 </script>
 
 <template>
-  <ProgressSpinner v-if="isFetching" />
+  <Spinner v-if="isFetching" />
 
   <div v-else>
     <FlightList :flights="data?.toFlights" />

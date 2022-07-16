@@ -13,7 +13,7 @@ onMounted(async () => {
 
 <template>
   <h1>My Tickets</h1>
-  <ProgressSpinner v-if="isFetching" />
+  <Spinner v-if="isFetching" />
 
   <div v-else-if="data">
     <Ticket v-for="order in data.orders" :key="order.id" v-bind="order" />

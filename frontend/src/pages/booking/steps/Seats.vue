@@ -54,7 +54,7 @@ onActivated(async () => {
 </script>
 
 <template>
-  <ProgressSpinner v-if="isFetching" />
+  <Spinner v-if="isFetching" />
 
   <div v-else>
     Rows: {{ data?.seatRowCount }} Columns: {{ data?.seatColCount }}
