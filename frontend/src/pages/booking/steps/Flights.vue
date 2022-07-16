@@ -42,11 +42,7 @@ onActivated(async () => {
 
   <div v-else class="mb-5">
     <FlightList :flights="flightData?.toFlights" />
-
-    <Divider v-if="flightData?.returnFlights" align="center" class="my-6">
-      <span class="p-tag">FlyTonight</span>
-    </Divider>
-
+    <SectionDivider v-if="flightData?.returnFlights" />
     <FlightList :flights="flightData?.returnFlights" isReturn />
   </div>
 
