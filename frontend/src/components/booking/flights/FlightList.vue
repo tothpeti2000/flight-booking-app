@@ -22,7 +22,7 @@ const title = `${props.isReturn ? "Return" : ""} Flights available`;
         :key="flight.flightId"
         :flight="flight"
         :isReturn="isReturn"
-        class="shadow-2 mb-3 hover:bg-blue-200"
+        class="shadow-2 mb-3 hover:bg-blue-200 cursor-pointer transition-duration-200"
       />
     </div>
 
