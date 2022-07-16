@@ -55,6 +55,14 @@ export const validateMultipleForms = async (forms: any) => {
   return validationResults.every((result) => result === true);
 };
 
+export const validateReturnTickets = (passengerForms: any) => {
+  const validationResults = passengerForms.value?.map((form: any) =>
+    form.validateReturnTicketType()
+  ) as [];
+
+  return validationResults.every((result) => result === true);
+};
+
 const maxValueExceeded = (
   reservations: SeatFormData[],
   rows: number,

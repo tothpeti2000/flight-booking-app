@@ -5,4 +5,6 @@ export interface PassengerDetails {
   lastName: string;
   type: TicketSelectOption | undefined;
   isLuggage: boolean;
+  typeReturn?: TicketSelectOption | undefined;
+  isLuggageReturn?: boolean;
 }
