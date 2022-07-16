@@ -7,6 +7,7 @@ import {
   required,
 } from "@vuelidate/validators";
 import { intersectionWith, isEqual, uniqWith } from "lodash-es";
+import moment from "moment";
 import useFeedback from "../useFeedback";
 
 const hasCapitalLetter = (value: string) => value.match(/[A-Z]/g) !== null;
@@ -122,6 +123,27 @@ export const validateSeatReservations = (
       );
       return false;
     }
+  }
+
+  return true;
+};
+
+export const datesValid = (
+  departureDate: Date,
+  returnDate: Date | undefined
+) => {
+  const { showError } = useFeedback();
+
+  const nextDay = moment().add(1, "day");
+
+  if (nextDay.isAfter(departureDate, "day")) {
+    showError("You can only book flights for tomorrow or later");
+    return false;
+  }
+
+  if (returnDate && returnDate < departureDate) {
+    showError("The return date must follow the departure date");
+    return false;
   }
 
   return true;

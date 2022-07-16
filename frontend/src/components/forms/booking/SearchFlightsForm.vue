@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useBookingStore } from "@/store/store";
+import { datesValid } from "../validationUtils";
 import useSearchFlights from "./useSearchFlights";
 
 const { saveBookingOptions } = useBookingStore()!;
@@ -8,11 +9,18 @@ const { data: bookingOptions, v$ } = useSearchFlights();
 const emit = defineEmits(["prev-page", "next-page"]);
 
 const validate = async () => {
-  const isValid = await v$.value.$validate();
+  const isFormValid = await v$.value.$validate();
 
-  if (isValid) {
-    saveBookingOptions(bookingOptions);
-    emit("next-page", { pageIdx: 0 });
+  if (isFormValid) {
+    const validDates = datesValid(
+      bookingOptions.departureDate,
+      bookingOptions.returnDate
+    );
+
+    if (validDates) {
+      saveBookingOptions(bookingOptions);
+      emit("next-page", { pageIdx: 0 });
+    }
   }
 };
 </script>
