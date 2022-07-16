@@ -33,10 +33,10 @@ defineExpose({ passengerData, validateForm });
     :errors="v$.type.$errors"
   >
     <Dropdown
-      id="gender"
+      id="ticket"
       :options="ticketTypes"
       optionLabel="label"
-      optionValue="value"
+      optionValue="label"
       v-model="v$.type.$model"
     />
   </InputElement>

@@ -1,17 +1,12 @@
 import type { BookingOptions } from "./start";
 
 type TicketType = "Tourist" | "Premium" | "SuperPremium";
-export type TicketSelectOption = { label: TicketType; value: 0 | 1 | 2 };
-export enum TicketEnum {
-  Tourist,
-  Premium,
-  SuperPremium,
-}
+export type TicketSelectOption = { label: TicketType };
 
 export const ticketTypes: TicketSelectOption[] = [
-  { label: "Tourist", value: 0 },
-  { label: "Premium", value: 1 },
-  { label: "SuperPremium", value: 2 },
+  { label: "Tourist" },
+  { label: "Premium" },
+  { label: "SuperPremium" },
 ];
 
 export interface Ticket {
