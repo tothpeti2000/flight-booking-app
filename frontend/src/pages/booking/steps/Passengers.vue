@@ -1,40 +1,32 @@
 <script setup lang="ts">
 import PassengerForm from "@/components/forms/booking/PassengerForm.vue";
-import {
-  validateMultipleForms,
-  validateReturnTickets,
-} from "@/components/forms/validationUtils";
-import useFeedback from "@/components/useFeedback";
+import { validateMultipleForms } from "@/components/forms/validationUtils";
 import { useBookingStore } from "@/store/store";
 import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 
-const { bookingOptions, savePassengers } = useBookingStore()!;
-const { showError } = useFeedback();
+const { bookingOptions, returnFlight, savePassengers } = useBookingStore()!;
 
 const totalPassengers = computed(
   () => bookingOptions.value?.passengerCount ?? 0
 );
 
+const returnFlightChosen = computed(() => !!returnFlight.value);
+
 const passengerForms = ref<InstanceType<typeof PassengerForm>[] | null>(null);
 const emit = defineEmits(["prev-page", "next-page"]);
 
 const validate = async () => {
-  const allFormsValid = await validateMultipleForms(passengerForms);
+  const allFormsValid = await validateMultipleForms(
+    passengerForms,
+    returnFlightChosen.value
+  );
 
   if (allFormsValid) {
-    const returnTicketsValid = validateReturnTickets(passengerForms);
+    const passengers = passengerForms.value?.map((form) => form.passengerData);
 
-    if (!returnTicketsValid) {
-      showError("You must choose return tickets for all passengers");
-    } else {
-      const passengers = passengerForms.value?.map(
-        (form) => form.passengerData
-      );
-
-      savePassengers(passengers);
-      emit("next-page", { pageIdx: 2 });
-    }
+    savePassengers(passengers);
+    emit("next-page", { pageIdx: 2 });
   }
 };
 </script>

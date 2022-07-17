@@ -4,19 +4,23 @@ import { useBookingStore } from "@/store/store";
 import usePassengers from "./usePassengers";
 
 const { toFlight, returnFlight } = useBookingStore()!;
-const { data: passengerData, v$ } = usePassengers();
+
+const {
+  data: passengerData,
+  v$,
+  dataReturn: passengerDataReturn,
+  vReturn$,
+} = usePassengers();
 
 const validateForm = v$.value.$validate;
+const validateReturnForm = vReturn$.value.$validate;
 
-const validateReturnTicketType = () => {
-  if (returnFlight.value && !passengerData.typeReturn) {
-    return false;
-  }
-
-  return true;
-};
-
-defineExpose({ passengerData, validateForm, validateReturnTicketType });
+defineExpose({
+  passengerData,
+  passengerDataReturn,
+  validateForm,
+  validateReturnForm,
+});
 </script>
 
 <template>
@@ -74,19 +78,23 @@ defineExpose({ passengerData, validateForm, validateReturnTicketType });
         {{ returnFlight.arrivalCity }}
       </h3>
 
-      <InputElement label="Ticket type">
+      <InputElement
+        label="Ticket type"
+        :has-error="vReturn$.type.$invalid"
+        :errors="vReturn$.type.$errors"
+      >
         <Dropdown
           id="returnTicket"
           :options="ticketTypes"
           optionLabel="label"
           optionValue="label"
-          v-model="passengerData.typeReturn"
+          v-model="vReturn$.type.$model"
         />
       </InputElement>
 
       <CheckboxElement
         id="luggage"
-        v-model="passengerData.isLuggageReturn"
+        v-model="passengerDataReturn.isLuggage"
         label="I want to take a luggage with me"
       />
     </div>

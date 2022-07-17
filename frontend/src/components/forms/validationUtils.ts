@@ -45,10 +45,19 @@ export const maxCharacters = (maxCharacters: number) =>
     maxLength(maxCharacters)
   );
 
-export const validateMultipleForms = async (forms: any) => {
+export const validateMultipleForms = async (
+  forms: any,
+  returnFlightChosen: boolean
+) => {
   const validationResults = await Promise.all(
     forms.value?.map(async (form: any) => {
-      return await form.validateForm();
+      const formValid = await form.validateForm();
+      const returnFormValid = await form.validateReturnForm();
+
+      return (
+        formValid &&
+        ((returnFormValid && returnFlightChosen) || !returnFlightChosen)
+      );
     }) as []
   );
 
