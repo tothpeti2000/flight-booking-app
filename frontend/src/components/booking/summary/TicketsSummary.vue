@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { TicketsProps } from "@/interfaces/booking/confirmation";
+import { computed } from "vue";
 
 const props = defineProps<TicketsProps>();
 
-const hasLuggages = props.tickets.map((ticket) =>
-  ticket.isLuggage ? "yes" : "no"
+const hasLuggages = computed(() =>
+  props.tickets.map((ticket) => (ticket.isLuggage ? "yes" : "no"))
 );
 </script>
 
