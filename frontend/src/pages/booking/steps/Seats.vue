@@ -11,7 +11,7 @@ import { useBookingStore } from "@/store/store";
 import { computed } from "@vue/reactivity";
 import { onActivated, ref } from "vue";
 
-const { bookingOptions, toFlight, returnFlight, saveSeatReservations } =
+const { toFlight, returnFlight, passengerDetails, saveSeatReservations } =
   useBookingStore()!;
 
 const returnFlightChosen = computed(() => !!returnFlight.value);
@@ -142,8 +142,11 @@ onActivated(async () => {
       </div>
     </div>
 
-    <div v-for="idx in bookingOptions?.passengerCount" :key="idx">
-      <h1>Seat for Passenger #{{ idx }}</h1>
+    <div v-for="idx in passengerDetails.length" :key="idx">
+      <h1 class="mb-4">
+        {{ passengerDetails[idx - 1].firstName }}
+        {{ passengerDetails[idx - 1].lastName }}'s seat
+      </h1>
       <SeatForm ref="seatForms" />
     </div>
   </div>
