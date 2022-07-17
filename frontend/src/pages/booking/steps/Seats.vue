@@ -112,42 +112,27 @@ onActivated(async () => {
   <Spinner v-if="fetching || fetchingReturn" />
 
   <div v-else>
-    <div class="flex justify-content-between">
-      <div>
-        {{ seatData?.planeType }}
-        Rows: {{ seatData?.seatRowCount }} Columns: {{ seatData?.seatColCount }}
+    <div class="flex justify-content-around surface-100 p-3 mb-4">
+      <PlaneDetails :flight="toFlight" :seatData="seatData" />
 
-        <div v-if="seatData?.bookedSeats">
-          <h1>Booked seats</h1>
-          <div v-for="(bookedSeat, idx) in seatData.bookedSeats" :key="idx">
-            Row {{ bookedSeat.rowNum }} - Column {{ bookedSeat.colNum }}
-          </div>
-        </div>
-      </div>
-
-      <div v-if="returnFlightChosen">
-        {{ seatReturnData?.planeType }}
-        Rows: {{ seatReturnData?.seatRowCount }} Columns:
-        {{ seatReturnData?.seatColCount }}
-
-        <div v-if="seatReturnData?.bookedSeats">
-          <h1>Booked seats</h1>
-          <div
-            v-for="(bookedSeat, idx) in seatReturnData.bookedSeats"
-            :key="idx"
-          >
-            Row {{ bookedSeat.rowNum }} - Column {{ bookedSeat.colNum }}
-          </div>
-        </div>
-      </div>
+      <PlaneDetails
+        v-if="returnFlightChosen"
+        :flight="returnFlight"
+        :seatData="seatReturnData"
+      >
+      </PlaneDetails>
     </div>
 
     <div v-for="idx in passengerDetails.length" :key="idx">
-      <h1 class="mb-4">
-        {{ passengerDetails[idx - 1].firstName }}
-        {{ passengerDetails[idx - 1].lastName }}'s seat
-      </h1>
-      <SeatForm ref="seatForms" />
+      <div class="p-3 hover:shadow-3 transition-duration-300">
+        <h1 class="mb-4 font-bold text-blue-600">
+          {{ passengerDetails[idx - 1].firstName }}
+          {{ passengerDetails[idx - 1].lastName }}'s seat
+        </h1>
+        <SeatForm ref="seatForms" />
+      </div>
+
+      <SectionDivider />
     </div>
   </div>
 

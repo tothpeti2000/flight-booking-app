@@ -45,8 +45,11 @@ const validate = async () => {
 
 <template>
   <div v-for="idx in totalPassengers" :key="idx">
-    <h1 class="mb-4 font-bold">Passenger {{ idx }}</h1>
-    <PassengerForm ref="passengerForms" />
+    <div class="p-3 hover:shadow-3 transition-duration-300">
+      <h1 class="mb-4 font-bold text-blue-600">Passenger {{ idx }}</h1>
+      <PassengerForm ref="passengerForms" />
+    </div>
+
     <SectionDivider />
   </div>
 
