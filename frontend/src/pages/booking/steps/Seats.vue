@@ -7,12 +7,19 @@ import {
   validateSeatReservations,
 } from "@/components/forms/validationUtils";
 import { useBookingStore } from "@/store/store";
+import { computed } from "@vue/reactivity";
 import { onActivated, ref } from "vue";
 
-const { bookingOptions, toFlight, saveSeatReservations } = useBookingStore()!;
+const { bookingOptions, toFlight, returnFlight, saveSeatReservations } =
+  useBookingStore()!;
+
+const returnFlightChosen = computed(() => !!returnFlight.value);
 
 const planeId = toFlight.value?.planeId;
 const flightId = toFlight.value?.flightId;
+
+const planeIdReturn = returnFlight.value?.planeId;
+const flightIdReturn = returnFlight.value?.flightId;
 
 const {
   execute: fetchSeats,
@@ -24,14 +31,31 @@ const {
   flightId: flightId,
 });
 
+const {
+  execute: fetchReturnSeats,
+  data: dataReturn,
+  isFetching: isFetchingReturn,
+  statusCode: statusCodeReturn,
+} = getSeats({
+  planeId: planeIdReturn,
+  flightId: flightIdReturn,
+});
+
 const seatForms = ref<InstanceType<typeof SeatForm>[] | null>(null);
 const emit = defineEmits(["prev-page", "next-page"]);
 
 const validate = async () => {
-  const allFormsValid = await validateMultipleForms(seatForms);
+  const allFormsValid = await validateMultipleForms(
+    seatForms,
+    returnFlightChosen.value
+  );
 
   if (allFormsValid) {
     const seatReservations = seatForms.value?.map((form) => form.data);
+
+    const seatReturnReservations = seatForms.value?.map(
+      (form) => form.dataReturn
+    );
 
     const reservationsValid = validateSeatReservations(
       data.value?.bookedSeats,
@@ -40,8 +64,17 @@ const validate = async () => {
       data.value?.seatColCount
     );
 
-    if (reservationsValid) {
-      saveSeatReservations(seatReservations);
+    const reservationsReturnValid = validateSeatReservations(
+      dataReturn.value?.bookedSeats,
+      seatReturnReservations,
+      dataReturn.value?.seatRowCount,
+      dataReturn.value?.seatColCount
+    );
+
+    if (reservationsValid && reservationsReturnValid) {
+      saveSeatReservations(seatReservations, false);
+      saveSeatReservations(seatReturnReservations, true);
+
       emit("next-page", { pageIdx: 3 });
     }
   }
@@ -50,19 +83,38 @@ const validate = async () => {
 onActivated(async () => {
   await fetchSeats();
   handleResponse(statusCode.value, data.value);
+
+  await fetchReturnSeats();
+  handleResponse(statusCodeReturn.value, dataReturn.value);
 });
 </script>
 
 <template>
-  <Spinner v-if="isFetching" />
+  <Spinner v-if="isFetching || isFetchingReturn" />
 
   <div v-else>
-    Rows: {{ data?.seatRowCount }} Columns: {{ data?.seatColCount }}
+    <div class="flex justify-content-between">
+      <div>
+        Rows: {{ data?.seatRowCount }} Columns: {{ data?.seatColCount }}
 
-    <div v-if="data?.bookedSeats">
-      <h1>Booked seats</h1>
-      <div v-for="(bookedSeat, idx) in data.bookedSeats" :key="idx">
-        Row {{ bookedSeat.rowNum }} - Column {{ bookedSeat.colNum }}
+        <div v-if="data?.bookedSeats">
+          <h1>Booked seats</h1>
+          <div v-for="(bookedSeat, idx) in data.bookedSeats" :key="idx">
+            Row {{ bookedSeat.rowNum }} - Column {{ bookedSeat.colNum }}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        Rows: {{ dataReturn?.seatRowCount }} Columns:
+        {{ dataReturn?.seatColCount }}
+
+        <div v-if="dataReturn?.bookedSeats">
+          <h1>Booked seats</h1>
+          <div v-for="(bookedSeat, idx) in dataReturn.bookedSeats" :key="idx">
+            Row {{ bookedSeat.rowNum }} - Column {{ bookedSeat.colNum }}
+          </div>
+        </div>
       </div>
     </div>
 

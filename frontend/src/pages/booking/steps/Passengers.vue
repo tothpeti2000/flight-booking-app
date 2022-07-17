@@ -5,7 +5,12 @@ import { useBookingStore } from "@/store/store";
 import { computed } from "@vue/reactivity";
 import { ref } from "vue";
 
-const { bookingOptions, returnFlight, savePassengers } = useBookingStore()!;
+const {
+  bookingOptions,
+  returnFlight,
+  savePassengerDetails,
+  savePassengerReturnDetails,
+} = useBookingStore()!;
 
 const totalPassengers = computed(
   () => bookingOptions.value?.passengerCount ?? 0
@@ -23,9 +28,16 @@ const validate = async () => {
   );
 
   if (allFormsValid) {
-    const passengers = passengerForms.value?.map((form) => form.passengerData);
+    const passengerDetails = passengerForms.value?.map(
+      (form) => form.passengerData
+    );
 
-    savePassengers(passengers);
+    const passengerReturnDetails = passengerForms.value?.map(
+      (form) => form.passengerDataReturn
+    );
+
+    savePassengerDetails(passengerDetails);
+    savePassengerReturnDetails(passengerReturnDetails);
     emit("next-page", { pageIdx: 2 });
   }
 };

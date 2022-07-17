@@ -10,16 +10,24 @@ const useSeats = () => {
     rowNum: undefined,
   });
 
+  const dataReturn = reactive<SeatFormData>({
+    colNum: undefined,
+    rowNum: undefined,
+  });
+
   const schema = {
     colNum: { requiredField, minValue: minValue(1) },
     rowNum: { requiredField, minValue: minValue(1) },
   };
 
   const v$ = useVuelidate(schema, data);
+  const vReturn$ = useVuelidate(schema, dataReturn);
 
   return {
     data,
     v$,
+    dataReturn,
+    vReturn$,
   };
 };
 
