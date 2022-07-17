@@ -1,13 +1,22 @@
 <script setup lang="ts">
-import type { Flight } from "@/interfaces/booking/flights";
+import type { FlightSummaryProps } from "@/interfaces/booking/flightSummaryProps";
 import { useBookingStore } from "@/store/store";
+import { computed } from "@vue/reactivity";
 
-const flight = defineProps<Flight>();
+const props = withDefaults(defineProps<FlightSummaryProps>(), {
+  isReturn: false,
+});
 
 const { order } = useBookingStore()!;
+
+const tickets = computed(() => {
+  return props.isReturn
+    ? order.value.returnFlight?.tickets ?? []
+    : order.value.toFlight.tickets;
+});
 </script>
 
 <template>
   <FlightCard :flight="flight" />
-  <TicketsSummary :tickets="order.toFlight.tickets" />
+  <TicketsSummary :tickets="tickets" />
 </template>

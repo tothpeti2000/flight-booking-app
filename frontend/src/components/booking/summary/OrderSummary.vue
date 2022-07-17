@@ -8,10 +8,10 @@ const { toFlight, returnFlight } = useBookingStore()!;
   <h1>Order Summary</h1>
 
   <section v-if="toFlight">
-    <FlightSummary v-bind="toFlight" />
+    <FlightSummary :flight="toFlight" />
   </section>
 
   <section v-if="returnFlight">
-    <FlightSummary v-bind="returnFlight" />
+    <FlightSummary :flight="returnFlight" isReturn />
   </section>
 </template>
