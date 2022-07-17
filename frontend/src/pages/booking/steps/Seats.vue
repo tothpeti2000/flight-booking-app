@@ -50,7 +50,9 @@ const validate = async () => {
     if (reservationsValid) {
       saveSeatReservations(seatReservations, false);
 
-      if (returnFlightChosen.value) {
+      if (!returnFlightChosen.value) {
+        emit("next-page", { pageIdx: 3 });
+      } else {
         const seatReturnReservations = seatForms.value?.map(
           (form) => form.dataReturn
         );
