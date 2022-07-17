@@ -6,6 +6,7 @@ import {
   validateMultipleForms,
   validateSeatReservations,
 } from "@/components/forms/validationUtils";
+import type { SeatData } from "@/interfaces/booking/seats";
 import { useBookingStore } from "@/store/store";
 import { computed } from "@vue/reactivity";
 import { onActivated, ref } from "vue";
@@ -15,31 +16,17 @@ const { bookingOptions, toFlight, returnFlight, saveSeatReservations } =
 
 const returnFlightChosen = computed(() => !!returnFlight.value);
 
-const planeId = toFlight.value?.planeId;
-const flightId = toFlight.value?.flightId;
+const planeId = computed(() => toFlight.value?.planeId);
+const flightId = computed(() => toFlight.value?.flightId);
 
-const planeIdReturn = returnFlight.value?.planeId;
-const flightIdReturn = returnFlight.value?.flightId;
+const planeIdReturn = computed(() => returnFlight.value?.planeId);
+const flightIdReturn = computed(() => returnFlight.value?.flightId);
 
-const {
-  execute: fetchSeats,
-  data,
-  isFetching,
-  statusCode,
-} = getSeats({
-  planeId: planeId,
-  flightId: flightId,
-});
+const seatData = ref<SeatData | null>();
+const fetching = ref(true);
 
-const {
-  execute: fetchReturnSeats,
-  data: dataReturn,
-  isFetching: isFetchingReturn,
-  statusCode: statusCodeReturn,
-} = getSeats({
-  planeId: planeIdReturn,
-  flightId: flightIdReturn,
-});
+const seatReturnData = ref<SeatData | null>();
+const fetchingReturn = ref(true);
 
 const seatForms = ref<InstanceType<typeof SeatForm>[] | null>(null);
 const emit = defineEmits(["prev-page", "next-page"]);
@@ -53,65 +40,100 @@ const validate = async () => {
   if (allFormsValid) {
     const seatReservations = seatForms.value?.map((form) => form.data);
 
-    const seatReturnReservations = seatForms.value?.map(
-      (form) => form.dataReturn
-    );
-
     const reservationsValid = validateSeatReservations(
-      data.value?.bookedSeats,
+      seatData.value?.bookedSeats,
       seatReservations,
-      data.value?.seatRowCount,
-      data.value?.seatColCount
+      seatData.value?.seatRowCount,
+      seatData.value?.seatColCount
     );
 
-    const reservationsReturnValid = validateSeatReservations(
-      dataReturn.value?.bookedSeats,
-      seatReturnReservations,
-      dataReturn.value?.seatRowCount,
-      dataReturn.value?.seatColCount
-    );
-
-    if (reservationsValid && reservationsReturnValid) {
+    if (reservationsValid) {
       saveSeatReservations(seatReservations, false);
-      saveSeatReservations(seatReturnReservations, true);
 
-      emit("next-page", { pageIdx: 3 });
+      if (returnFlightChosen.value) {
+        const seatReturnReservations = seatForms.value?.map(
+          (form) => form.dataReturn
+        );
+
+        const reservationsReturnValid = validateSeatReservations(
+          seatReturnData.value?.bookedSeats,
+          seatReturnReservations,
+          seatReturnData.value?.seatRowCount,
+          seatReturnData.value?.seatColCount
+        );
+
+        if (reservationsReturnValid) {
+          saveSeatReservations(seatReturnReservations, true);
+          emit("next-page", { pageIdx: 3 });
+        }
+      }
     }
   }
 };
 
 onActivated(async () => {
+  const {
+    execute: fetchSeats,
+    data,
+    statusCode,
+  } = getSeats({
+    planeId: planeId.value,
+    flightId: flightId.value,
+  });
+
+  const {
+    execute: fetchReturnSeats,
+    data: dataReturn,
+    statusCode: statusCodeReturn,
+  } = getSeats({
+    planeId: planeIdReturn.value,
+    flightId: flightIdReturn.value,
+  });
+
   await fetchSeats();
   handleResponse(statusCode.value, data.value);
 
-  await fetchReturnSeats();
-  handleResponse(statusCodeReturn.value, dataReturn.value);
+  fetching.value = false;
+  seatData.value = data.value;
+
+  if (returnFlightChosen) {
+    await fetchReturnSeats();
+    handleResponse(statusCodeReturn.value, dataReturn.value);
+
+    fetchingReturn.value = false;
+    seatReturnData.value = dataReturn.value;
+  }
 });
 </script>
 
 <template>
-  <Spinner v-if="isFetching || isFetchingReturn" />
+  <Spinner v-if="fetching || fetchingReturn" />
 
   <div v-else>
     <div class="flex justify-content-between">
       <div>
-        Rows: {{ data?.seatRowCount }} Columns: {{ data?.seatColCount }}
+        {{ seatData?.planeType }}
+        Rows: {{ seatData?.seatRowCount }} Columns: {{ seatData?.seatColCount }}
 
-        <div v-if="data?.bookedSeats">
+        <div v-if="seatData?.bookedSeats">
           <h1>Booked seats</h1>
-          <div v-for="(bookedSeat, idx) in data.bookedSeats" :key="idx">
+          <div v-for="(bookedSeat, idx) in seatData.bookedSeats" :key="idx">
             Row {{ bookedSeat.rowNum }} - Column {{ bookedSeat.colNum }}
           </div>
         </div>
       </div>
 
-      <div>
-        Rows: {{ dataReturn?.seatRowCount }} Columns:
-        {{ dataReturn?.seatColCount }}
+      <div v-if="returnFlightChosen">
+        {{ seatReturnData?.planeType }}
+        Rows: {{ seatReturnData?.seatRowCount }} Columns:
+        {{ seatReturnData?.seatColCount }}
 
-        <div v-if="dataReturn?.bookedSeats">
+        <div v-if="seatReturnData?.bookedSeats">
           <h1>Booked seats</h1>
-          <div v-for="(bookedSeat, idx) in dataReturn.bookedSeats" :key="idx">
+          <div
+            v-for="(bookedSeat, idx) in seatReturnData.bookedSeats"
+            :key="idx"
+          >
             Row {{ bookedSeat.rowNum }} - Column {{ bookedSeat.colNum }}
           </div>
         </div>
