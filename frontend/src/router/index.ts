@@ -14,8 +14,6 @@ const Confirmation = () => import("../pages/booking/steps/Confirmation.vue");
 
 const NotFound = () => import("../pages/NotFound.vue");
 
-const { token } = useToken();
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -79,6 +77,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from) => {
+  const { token } = useToken();
+
   if (to.meta.requireAuth && !token.value) {
     return { path: "/login" };
   }
