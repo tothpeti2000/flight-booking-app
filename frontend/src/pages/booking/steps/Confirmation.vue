@@ -30,7 +30,7 @@ const handlePlaceOrder = async () => {
 
   <Button
     label="Place Order"
-    class="p-button-success w-full"
+    class="p-button-success w-full my-5"
     @click="handlePlaceOrder"
     :loading="isFetching"
   />
