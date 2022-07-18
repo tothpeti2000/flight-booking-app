@@ -4,9 +4,10 @@ import { handleResponse } from "@/api/useAPI";
 import type SeatSelector from "@/components/booking/seats/SeatSelector.vue";
 import type SeatForm from "@/components/forms/booking/SeatForm.vue";
 import { validateSeatReservations } from "@/components/forms/validationUtils";
-import type { SeatData } from "@/interfaces/booking/seats";
+import type { SeatData, SeatFormData } from "@/interfaces/booking/seats";
 import { useBookingStore } from "@/store/store";
 import { computed } from "@vue/reactivity";
+import { map, partialRight, pick } from "lodash";
 import { onActivated, ref } from "vue";
 
 const { toFlight, returnFlight, passengerDetails, saveSeatReservations } =
@@ -57,18 +58,26 @@ const seatSelectorReturn = ref<InstanceType<typeof SeatSelector> | null>(null);
 const emit = defineEmits(["prev-page", "next-page"]);
 
 const validate = async () => {
-  const reservationsValid = validateSeatReservations(
-    seatSelector.value?.passengers
-  );
+  const toSeats: SeatFormData[] = map(
+    seatSelector.value?.passengers,
+    partialRight(pick, ["colNum", "rowNum"])
+  ) as SeatFormData[];
+
+  const returnSeats: SeatFormData[] = map(
+    seatSelectorReturn.value?.passengers,
+    partialRight(pick, ["colNum", "rowNum"])
+  ) as SeatFormData[];
+
+  const reservationsValid = validateSeatReservations(toSeats);
 
   if (reservationsValid) {
     if (!returnFlightChosen.value) {
+      saveSeatReservations(toSeats, false);
       emit("next-page", { pageIdx: 3 });
     } else {
-      const reservationsReturnValid = validateSeatReservations(
-        seatSelectorReturn.value?.passengers
-      );
+      const reservationsReturnValid = validateSeatReservations(returnSeats);
 
+      saveSeatReservations(returnSeats, true);
       reservationsReturnValid && emit("next-page", { pageIdx: 3 });
     }
   }

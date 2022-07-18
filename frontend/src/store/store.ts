@@ -48,6 +48,7 @@ const [useProvideBookingStore, useBookingStore] = createInjectionState(() => {
     isReturn: boolean
   ) => {
     if (reservations) {
+      console.log(reservations);
       isReturn
         ? (seatReturnReservations.value = reservations)
         : (seatReservations.value = reservations);
