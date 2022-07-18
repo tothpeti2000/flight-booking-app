@@ -8,6 +8,10 @@ export interface SeatFormData {
   rowNum: number | undefined;
 }
 
+export interface ColoredSeatFormData extends SeatFormData {
+  color: string;
+}
+
 export interface SeatData {
   planeType: string;
   seatColCount: number;

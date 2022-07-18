@@ -107,42 +107,24 @@ const invalidSeats = (reservations: SeatFormData[], bookedSeats: Seat[]) => {
 };
 
 export const validateSeatReservations = (
-  bookedSeats: Seat[] | undefined,
-  reservations: SeatFormData[] | undefined,
-  rows: number | undefined,
-  columns: number | undefined
+  reservations: SeatFormData[] | undefined
 ) => {
   const { showError } = useFeedback();
 
-  if (!bookedSeats || !reservations || !rows || !columns) {
+  if (!reservations) {
     showError("Error while trying to book the seats");
     return false;
   }
 
-  // Check if row and column values exceed the max value
-  if (maxValueExceeded(reservations, rows, columns)) {
-    showError(`There are only ${rows} rows and ${columns} columns`);
+  const validationResults = reservations.map(
+    (reservation) =>
+      reservation.rowNum !== undefined && reservation.colNum !== undefined
+  );
 
-    return false;
-  }
+  const isValid = validationResults.every((result) => result === true);
+  !isValid && showError("You must choose a seat for all passengers");
 
-  // Check if every reservation is different
-  if (!reservationsUnique(reservations)) {
-    showError("The same seat has been booked by multiple passengers");
-    return false;
-  } else {
-    // Check if any reserved seat has been booked already
-    const alreadyBookedSeats = invalidSeats(reservations, bookedSeats);
-
-    if (alreadyBookedSeats.length > 0) {
-      showError(
-        `The following seats have been booked already: ${alreadyBookedSeats}`
-      );
-      return false;
-    }
-  }
-
-  return true;
+  return isValid;
 };
 
 export const datesValid = (
